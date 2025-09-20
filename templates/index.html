@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume & Cover Letter Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 40px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 40px;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid #e9ecef;
+        }
+
+        .form-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .output-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            border: 1px solid #e9ecef;
+        }
+
+        .output-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #e74c3c;
+            padding-bottom: 10px;
+        }
+
+        .output-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+            min-height: 200px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px 20px;
+            background: #e9ecef;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1> AI Resume & Cover Letter Generator</h1>
+            <p>Create professional resumes and cover letters tailored to any job description</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Input Section -->
+            <div class="form-section">
+                <h2>📝 Your Information</h2>
+                <form id="userForm">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="location">Location</label>
+                        <input type="text" id="location" name="location" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="experience">Work Experience</label>
+                        <textarea id="experience" name="experience" placeholder="Describe your work experience, achievements, and responsibilities..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="education">Education</label>
+                        <textarea id="education" name="education" placeholder="Your educational background..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="skills">Skills</label>
+                        <textarea id="skills" name="skills" placeholder="List your technical and soft skills..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="jobDescription">Job Description</label>
+                        <textarea id="jobDescription" name="jobDescription" placeholder="Paste the job description here..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="companyName">Company Name (for cover letter)</label>
+                        <input type="text" id="companyName" name="companyName">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tone">Tone</label>
+                        <select id="tone" name="tone">
+                            <option value="professional">Professional</option>
+                            <option value="confident">Confident</option>
+                            <option value="casual">Casual</option>
+                            <option value="formal">Formal</option>
+                        </select>
+                    </div>
+                    
+                    <button type="button" class="btn" onclick="generateResume()">🎯 Generate Resume</button>
+                    <button type="button" class="btn btn-secondary" onclick="generateCoverLetter()">📄 Generate Cover Letter</button>
+                </form>
+            </div>
+
+            <!-- Output Section -->
+            <div class="output-section">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="showTab('resume')">Resume</button>
+                    <button class="tab-btn" onclick="showTab('cover-letter')">Cover Letter</button>
+                </div>
+                
+                <div id="resume-tab" class="tab-content active">
+                    <h2>📄 Generated Resume</h2>
+                    <div id="resumeOutput" class="output-content">
+                        Your generated resume will appear here...
+                    </div>
+                    <button class="btn btn-download" onclick="downloadPDF('resume')" style="display: none;" id="downloadResumeBtn">📥 Download PDF</button>
+                </div>
+                
+                <div id="cover-letter-tab" class="tab-content">
+                    <h2>💼 Generated Cover Letter</h2>
+                    <div id="coverLetterOutput" class="output-content">
+                        Your generated cover letter will appear here...
+                    </div>
+                    <button class="btn btn-download" onclick="downloadPDF('cover-letter')" style="display: none;" id="downloadCoverLetterBtn">📥 Download PDF</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let generatedResume = '';
+        let generatedCoverLetter = '';
+
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function showLoading(elementId) {
+            document.getElementById(elementId).innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Generating your content with AI...</p>
+                </div>
+            `;
+        }
+
+        function getUserData() {
+            return {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                location: document.getElementById('location').value,
+                experience: document.getElementById('experience').value,
+                education: document.getElementById('education').value,
+                skills: document.getElementById('skills').value
+            };
+        }
+
+        async function generateResume() {
+            showLoading('resumeOutput');
+            
+            const userData = getUserData();
+            const jobDescription = document.getElementById('jobDescription').value;
+            const tone = document.getElementById('tone').value;
+            
+            try {
+                const response = await fetch('/generate-resume', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_data: userData,
+                        job_description: jobDescription,
+                        tone: tone
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    generatedResume = data.resume_content;
+                    document.getElementById('resumeOutput').textContent = generatedResume;
+                    document.getElementById('downloadResumeBtn').style.display = 'inline-block';
+                } else {
+                    document.getElementById('resumeOutput').textContent = 'Error: ' + data.error;
+                }
+            } catch (error) {
+                document.getElementById('resumeOutput').textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function generateCoverLetter() {
+            showLoading('coverLetterOutput');
+            
+            const userData = getUserData();
+            const jobDescription = document.getElementById('jobDescription').value;
+            const companyName = document.getElementById('companyName').value;
+            const tone = document.getElementById('tone').value;
+            
+            try {
+                const response = await fetch('/generate-cover-letter', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_data: userData,
+                        job_description: jobDescription,
+                        company_name: companyName,
+                        tone: tone
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    generatedCoverLetter = data.cover_letter;
+                    document.getElementById('coverLetterOutput').textContent = generatedCoverLetter;
+                    document.getElementById('downloadCoverLetterBtn').style.display = 'inline-block';
+                } else {
+                    document.getElementById('coverLetterOutput').textContent = 'Error: ' + data.error;
+                }
+            } catch (error) {
+                document.getElementById('coverLetterOutput').textContent = 'Error: ' + error.message;
+            }
+        }
+
+        async function downloadPDF(type) {
+            const userData = getUserData();
+            const content = type === 'resume' ? generatedResume : generatedCoverLetter;
+            
+            try {
+                const response = await fetch('/download-pdf', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_data: userData,
+                        content: content
+                    })
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${type}_${new Date().toISOString().split('T')[0]}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } else {
+                    alert('Error downloading PDF');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
