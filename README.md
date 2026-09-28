@@ -296,7 +296,7 @@ This project is licensed under the **MIT License**.
 
 ### 🔗 Connect With Me
 
-* 💼 LinkedIn: [Add your LinkedIn profile]
+* 💼 LinkedIn: [https://www.linkedin.com/in/lucky-goyal-111766260/]
 * 🐙 GitHub: https://github.com/goyalucky
 
 ---
